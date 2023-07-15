@@ -99,7 +99,8 @@ void attach_process()
 		return;
 	}
 
-	find_modules_in_directory();
+	if (!find_modules_in_directory())
+		return;
 
 	for (auto& v_module : g_modulesToAttach)
 	{

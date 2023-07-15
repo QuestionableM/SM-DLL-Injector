@@ -1,3 +1,4 @@
 /.vs
 /Build
+/Code/Installer/PackedData
 *.vcxproj.user

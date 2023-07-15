@@ -10,25 +10,22 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Code\main.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{71fe2845-c8e0-4c98-abd8-dfc935dc5d77}</ProjectGuid>
-    <RootNamespace>SMDLLInjector</RootNamespace>
+    <ProjectGuid>{3c91ce42-0030-42c2-ad46-0ecb3a48f92f}</ProjectGuid>
+    <RootNamespace>Installer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -47,12 +44,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>dll_injector</TargetName>
+    <TargetName>DLL-Injector-Installer</TargetName>
     <OutDir>$(SolutionDir)Build\$(ProjectName)-$(PlatformShortName)-$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Build\Junk\$(ProjectName)-$(PlatformShortName)-$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>dll_injector</TargetName>
+    <TargetName>DLL-Injector-Installer</TargetName>
     <OutDir>$(SolutionDir)Build\$(ProjectName)-$(PlatformShortName)-$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Build\Junk\$(ProjectName)-$(PlatformShortName)-$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -69,6 +66,9 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)Build\FileToCpp-$(PlatformShortName)-$(Configuration)\FileToCpp.exe g_proxyDllData "$(SolutionDir)Build\SM-DLL-Injector-$(PlatformShortName)-$(Configuration)\dll_injector.dll" "$(SolutionDir)Code\Installer\PackedData\pd_dll_proxy.hpp"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -89,7 +89,16 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)Build\FileToCpp-$(PlatformShortName)-$(Configuration)\FileToCpp.exe g_proxyDllData "$(SolutionDir)Build\SM-DLL-Injector-$(PlatformShortName)-$(Configuration)\dll_injector.dll" "$(SolutionDir)Code\Installer\PackedData\pd_dll_proxy.hpp"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Code\Installer\installer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Code\Installer\PackedData\pd_dll_proxy.hpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

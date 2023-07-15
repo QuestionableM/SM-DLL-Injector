@@ -5,7 +5,7 @@ A simple injector for Scrap Mechanic which loads the modules when the game start
 - Install the latest release of the injector <b>[here](https://github.com/QuestionableM/SM-DLL-Injector/releases/latest)</b>
 - Go to `Steam/steamapps/common/Scrap Mechanic/Release`
 - Rename the original `vcruntime140_1.dll` to `vcruntime140_1_.dll`
-- Put the installed dll in the same directory
+- Put the installed `vcruntime_140_1.dll` in the same directory
 - DLL Injector is ready!
 
 # How to use

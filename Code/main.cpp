@@ -39,13 +39,42 @@ struct ModuleData
 
 static std::vector<ModuleData> g_modulesToAttach = {};
 
-void find_modules_in_directory()
+bool get_application_location(std::string& app_path)
 {
 	namespace fs = std::filesystem;
-	std::error_code v_ec;
-	fs::directory_iterator v_dir_iter("./DLLModules", fs::directory_options::skip_permission_denied, v_ec);
 
-	if (v_ec) return;
+	char v_path_buffer[MAX_PATH];
+	const DWORD v_buffer_size = GetModuleFileNameA(NULL, v_path_buffer, sizeof(v_path_buffer));
+	if (v_buffer_size == 0)
+	{
+		MessageBoxA(NULL, "Couldn't locate the application directory", "FATAL ERROR", MB_ICONERROR);
+		return false;
+	}
+
+	fs::path v_path = std::string(v_path_buffer, static_cast<std::size_t>(v_buffer_size));
+	if (!v_path.has_parent_path())
+	{
+		MessageBoxA(NULL, "Couldn't locate the parent path!", "NO PARENT PATH", MB_ICONERROR);
+		return false;
+	}
+
+	app_path = v_path.parent_path().string();
+	return true;
+}
+
+bool find_modules_in_directory()
+{
+	std::string v_app_directory;
+	if (!get_application_location(v_app_directory))
+		return false;
+
+	const std::string v_module_directory = v_app_directory + "/DLLModules";
+
+	namespace fs = std::filesystem;
+	std::error_code v_ec;
+	fs::directory_iterator v_dir_iter(v_module_directory, fs::directory_options::skip_permission_denied, v_ec);
+
+	if (v_ec) return false;
 
 	for (const auto& v_cur_dir : v_dir_iter)
 	{
@@ -57,6 +86,8 @@ void find_modules_in_directory()
 			.ptr = NULL
 		});
 	}
+
+	return true;
 }
 
 void attach_process()

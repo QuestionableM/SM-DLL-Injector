@@ -64,27 +64,33 @@ bool get_application_location(std::string& app_path)
 
 bool find_modules_in_directory()
 {
+	namespace fs = std::filesystem;
+
 	std::string v_app_directory;
 	if (!get_application_location(v_app_directory))
 		return false;
 
 	const std::string v_module_directory = v_app_directory + "/DLLModules";
 
-	namespace fs = std::filesystem;
 	std::error_code v_ec;
 	fs::directory_iterator v_dir_iter(v_module_directory, fs::directory_options::skip_permission_denied, v_ec);
 
-	if (v_ec) return false;
-
-	for (const auto& v_cur_dir : v_dir_iter)
+	if (!v_ec)
 	{
-		if (v_ec || !v_cur_dir.is_regular_file() || !v_cur_dir.path().has_extension())
-			continue;
+		for (const auto& v_cur_dir : v_dir_iter)
+		{
+			if (v_ec || !v_cur_dir.is_regular_file() || !v_cur_dir.path().has_extension())
+				continue;
 
-		g_modulesToAttach.push_back(ModuleData{
-			.path = v_cur_dir.path().string(),
-			.ptr = NULL
-		});
+			g_modulesToAttach.push_back(ModuleData{
+				.path = v_cur_dir.path().string(),
+				.ptr = NULL
+			});
+		}
+	}
+	else
+	{
+		MessageBoxA(NULL, "Couldn't find the DLLModules directory", "NO MODULES DIRECTORY", MB_OK);
 	}
 
 	return true;

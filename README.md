@@ -9,5 +9,5 @@ A simple injector for Scrap Mechanic which loads the modules when the game start
 - DLL Injector is ready!
 
 # How to use
-- Create `DLLModules` directory in `Steam/steamapps/common/Scrap Mechanic/Release` and put any `dll` module you want to execute at runtime
+- Create `DLLModules` directory in `Steam/steamapps/common/Scrap Mechanic/Release` and put any `dll` module you want to execute at runtime in that directory
 - Launch the game

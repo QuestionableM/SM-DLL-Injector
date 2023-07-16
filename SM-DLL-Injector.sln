@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Installer", "Installer.vcxp
 		{A2EBDDA3-8F9C-44CA-8CB0-2E439ACA18F6} = {A2EBDDA3-8F9C-44CA-8CB0-2E439ACA18F6}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Uninstaller", "Uninstaller.vcxproj", "{35EFE3D8-29AF-4731-A686-3FB41CFC9818}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,10 @@ Global
 		{3C91CE42-0030-42C2-AD46-0ECB3A48F92F}.Debug|x64.Build.0 = Debug|x64
 		{3C91CE42-0030-42C2-AD46-0ECB3A48F92F}.Release|x64.ActiveCfg = Release|x64
 		{3C91CE42-0030-42C2-AD46-0ECB3A48F92F}.Release|x64.Build.0 = Release|x64
+		{35EFE3D8-29AF-4731-A686-3FB41CFC9818}.Debug|x64.ActiveCfg = Debug|x64
+		{35EFE3D8-29AF-4731-A686-3FB41CFC9818}.Debug|x64.Build.0 = Debug|x64
+		{35EFE3D8-29AF-4731-A686-3FB41CFC9818}.Release|x64.ActiveCfg = Release|x64
+		{35EFE3D8-29AF-4731-A686-3FB41CFC9818}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

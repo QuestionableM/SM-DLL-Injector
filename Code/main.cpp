@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <Psapi.h>
+
 const char* g_dllFuncNames[] =
 {
 	"__CxxFrameHandler4",
@@ -96,6 +98,30 @@ bool find_modules_in_directory()
 	return true;
 }
 
+bool is_correct_process()
+{
+	const HANDLE v_cur_proc = GetCurrentProcess();
+	if (!v_cur_proc) return false;
+
+	HMODULE v_proc_module;
+	DWORD v_proc_needed;
+
+	if (!EnumProcessModules(v_cur_proc, &v_proc_module, sizeof(v_proc_module), &v_proc_needed))
+		return false;
+
+	char v_module_name[MAX_PATH] = "<UNKNOWN>";
+
+	DWORD v_buffer_size = GetModuleBaseNameA(v_cur_proc, v_proc_module, v_module_name, sizeof(v_module_name));
+	if (v_buffer_size == 0)
+		return false;
+
+	const std::string v_process_name_str(v_module_name, v_buffer_size);
+	if (v_process_name_str != "ScrapMechanic.exe")
+		return false;
+
+	return true;
+}
+
 void attach_process()
 {
 	g_dllModule = LoadLibraryA("vcruntime140_1_.dll");
@@ -105,16 +131,19 @@ void attach_process()
 		return;
 	}
 
-	if (!find_modules_in_directory())
-		return;
-
-	for (auto& v_module : g_modulesToAttach)
+	if (is_correct_process())
 	{
-		v_module.ptr = LoadLibraryA(v_module.path.c_str());
-		if (!v_module.ptr)
-		{
-			MessageBoxA(NULL, v_module.path.c_str(), "MODULE ERROR", MB_ICONERROR);
+		if (!find_modules_in_directory())
 			return;
+
+		for (auto& v_module : g_modulesToAttach)
+		{
+			v_module.ptr = LoadLibraryA(v_module.path.c_str());
+			if (!v_module.ptr)
+			{
+				MessageBoxA(NULL, v_module.path.c_str(), "MODULE ERROR", MB_ICONERROR);
+				return;
+			}
 		}
 	}
 

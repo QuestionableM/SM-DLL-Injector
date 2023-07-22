@@ -3,7 +3,7 @@ A simple injector for Scrap Mechanic which loads the modules when the game start
 
 # How to install
 <details>
-<summary><small>Manual Installation</small></summary><p>
+<summary><small>Manual Installation</small></summary>
 
 - Install the latest release of the injector <b>[here](https://github.com/QuestionableM/SM-DLL-Injector/releases/latest)</b>
 - Go to `Steam/steamapps/common/Scrap Mechanic/Release`
@@ -16,7 +16,7 @@ A simple injector for Scrap Mechanic which loads the modules when the game start
 <details>
 <summary><small>Automatic Installation</small></summary>
 
-- Install the `DLL-Injector-Installer.exe` <b>[here](https://github.com/QuestionableM/SM-DLL-Injector/releases/latest)</b>
+- Install `DLL-Injector-Installer.exe` <b>[here](https://github.com/QuestionableM/SM-DLL-Injector/releases/latest)</b>
 - Launch `DLL-Injector-Installer.exe` (make sure that the game is closed)
 - DLL Injector is ready!
   

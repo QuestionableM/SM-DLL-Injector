@@ -27,23 +27,22 @@ int file_to_cpp(const std::string& source_file, const std::string& output_file, 
 	}
 
 	v_output_file << "#pragma once\n\n";
-	v_output_file << "const char " << variable_name << "[" << v_source_bytes.size() << "] = {\n\t";
+	v_output_file << "const char " << variable_name << "[" << (v_source_bytes.size() + 1) << "] = {\n\t\"";
 
 	std::size_t v_counter = 0;
 	for (std::size_t a = 0; a < v_source_bytes.size(); a++)
 	{
-		if (a > 0) v_output_file << ",";
 		if (v_counter >= 50)
 		{
 			v_counter = 0;
-			v_output_file << "\n\t";
+			v_output_file << "\"\n\t\"";
 		}
 
-		v_output_file << "'\\x" << std::hex << (int)v_source_bytes[a] << "'";
+		v_output_file << "\\x" << std::hex << (int)v_source_bytes[a];
 		v_counter++;
 	}
 
-	v_output_file << "\n};";
+	v_output_file << "\"\n};";
 	v_output_file.close();
 
 	std::cout << "[FileToCpp] Successfully written to: " << output_file << std::endl;

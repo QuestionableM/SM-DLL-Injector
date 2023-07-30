@@ -42,7 +42,8 @@ bool run_main_installer(const std::wstring& game_directory)
 
 	File::CreateDir(game_directory + L"/DLLModules");
 
-	return write_packed_data(v_proxy_dll, g_proxyDllData, sizeof(g_proxyDllData));
+	//Subtract the null character from the binary
+	return write_packed_data(v_proxy_dll, g_proxyDllData, sizeof(g_proxyDllData) - 1);
 }
 
 int WINAPI WinMain(

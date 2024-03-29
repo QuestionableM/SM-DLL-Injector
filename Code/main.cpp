@@ -84,6 +84,9 @@ bool find_modules_in_directory()
 			if (v_ec || !v_cur_dir.is_regular_file() || !v_cur_dir.path().has_extension())
 				continue;
 
+			if (v_cur_dir.path().extension() != ".dll")
+				continue;
+
 			g_modulesToAttach.push_back(ModuleData{
 				.path = v_cur_dir.path().string(),
 				.ptr = NULL

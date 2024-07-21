@@ -62,9 +62,20 @@ int WINAPI WinMain(
 		{
 			DebugOutL("Found the game path: ", v_game_path);
 			if (run_main_installer(v_game_path))
+			{
 				DebugOutL(0b0101_fg, "Successfully installed the DLL-Injector!");
+			}
 			else
-				DebugOutL(0b1001_fg, "Something went wrong while installing the DLL-Injector!");
+			{
+				DebugErrorL("Something went wrong while installing the DLL-Injector!");
+				DebugErrorL("Make sure you are not running this in the same folder as ScrapMechanic.exe!");
+
+				DWORD v_error_code = GetLastError();
+				if (v_error_code)
+				{
+					DebugErrorL("(CODE: ", v_error_code, ") -> ", std::system_category().message(v_error_code));
+				}
+			}
 		}
 	}
 	else

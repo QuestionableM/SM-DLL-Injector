@@ -1,5 +1,8 @@
 # SM-DLL-Injector
-A simple injector for Scrap Mechanic which loads the modules when the game starts.
+A simple injector for Scrap Mechanic which loads the modules when the game starts.<br/>
+
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/QuestionableM/SM-DLL-Injector/total)
+
 
 # How to install
 <details>

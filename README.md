@@ -28,3 +28,6 @@ A simple injector for Scrap Mechanic which loads the modules when the game start
 # How to use
 - Create `DLLModules` directory in `Steam/steamapps/common/Scrap Mechanic/Release` and put any `dll` module you want to execute at runtime in that directory
 - Launch the game
+
+# How do I disable the injector without uninstalling it?
+- You can add `-noinject` to the launch arguments of the game to disable the injector

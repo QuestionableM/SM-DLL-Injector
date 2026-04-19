@@ -14,10 +14,10 @@
     <ClCompile Include="Code\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="Resources\sm_injector_resources.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="sm_injector_resources.rc" />
+    <ResourceCompile Include="Resources\sm_injector_resources.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

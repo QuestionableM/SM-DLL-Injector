@@ -47,5 +47,18 @@
     <ClInclude Include="Code\Utils\win_include.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Resources\installer_resources.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resources\installer_resources.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Code\Installer\PackedData\data.bin">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

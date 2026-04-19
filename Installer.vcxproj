@@ -69,7 +69,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>$(SolutionDir)Build\FileToCpp-$(PlatformShortName)-$(Configuration)\FileToCpp.exe g_proxyDllData "$(SolutionDir)Build\SM-DLL-Injector-$(PlatformShortName)-$(Configuration)\vcruntime140_1.dll" "$(SolutionDir)Code\Installer\PackedData\pd_dll_proxy.hpp"</Command>
+      <Command>mkdir "$(SolutionDir)Code\Installer\PackedData"
+copy "$(SolutionDir)Build\SM-DLL-Injector-$(PlatformShortName)-$(Configuration)\vcruntime140_1.dll" "$(SolutionDir)Code\Installer\PackedData\data.bin"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -94,7 +95,8 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>$(SolutionDir)Build\FileToCpp-$(PlatformShortName)-$(Configuration)\FileToCpp.exe g_proxyDllData "$(SolutionDir)Build\SM-DLL-Injector-$(PlatformShortName)-$(Configuration)\vcruntime140_1.dll" "$(SolutionDir)Code\Installer\PackedData\pd_dll_proxy.hpp"</Command>
+      <Command>mkdir "$(SolutionDir)Code\Installer\PackedData"
+copy "$(SolutionDir)Build\SM-DLL-Injector-$(PlatformShortName)-$(Configuration)\vcruntime140_1.dll" "$(SolutionDir)Code\Installer\PackedData\data.bin"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -110,6 +112,13 @@
     <ClInclude Include="Code\Utils\File.hpp" />
     <ClInclude Include="Code\Utils\String.hpp" />
     <ClInclude Include="Code\Utils\win_include.hpp" />
+    <ClInclude Include="Resources\installer_resources.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resources\installer_resources.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Code\Installer\PackedData\data.bin" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

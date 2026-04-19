@@ -2,3 +2,5 @@
 /Build
 /Code/Installer/PackedData
 *.vcxproj.user
+*.aps
+/Resources/RC*

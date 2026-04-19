@@ -164,10 +164,7 @@ static void AttachProcess()
 	if (IsCorrectProcess())
 	{
 		if (IsInjectorDisabled())
-		{
-			MessageBoxA(NULL, "DLL INJECTOR IS DISABLED", "HELLYEAH", MB_OK);
 			return;
-		}
 
 		if (!FindModuleInDirectory())
 			return;

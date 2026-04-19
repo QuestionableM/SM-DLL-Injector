@@ -6,7 +6,10 @@
 
 #include <fstream>
 
-static bool WritePackedData(const std::wstring& path, const void* pBinary, const std::size_t binarySz)
+static bool WritePackedData(
+	const std::wstring& path,
+	const void* pBinary,
+	const std::size_t binarySz)
 {
 	std::ofstream v_binOutput(path, std::ios::binary);
 	if (!v_binOutput.is_open())
@@ -19,7 +22,8 @@ static bool WritePackedData(const std::wstring& path, const void* pBinary, const
 	return true;
 }
 
-static bool RunMainInstaller(const std::wstring& gameDirectory)
+static bool RunMainInstaller(
+	const std::wstring& gameDirectory)
 {
 	const std::wstring v_movedDll = gameDirectory + L"/vcruntime140_1_.dll";
 	const std::wstring v_proxyDll = gameDirectory + L"/vcruntime140_1.dll";
@@ -27,6 +31,7 @@ static bool RunMainInstaller(const std::wstring& gameDirectory)
 	if (!File::Exists(v_movedDll))
 	{
 		DebugOutL("Moving the dll");
+
 		if (!File::Rename(v_proxyDll, v_movedDll))
 		{
 			DebugErrorL("Couldn't move the dll!");

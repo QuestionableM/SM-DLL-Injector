@@ -1,4 +1,5 @@
-#include <Windows.h>
+#include "Utils/win_include.hpp"
+#include "Utils/WinError.hpp"
 
 #include <filesystem>
 #include <cstddef>
@@ -22,7 +23,6 @@ extern "C"
 	#define GET_FUNC_DEF(func_name, func_id, ...) \
 		reinterpret_cast<decltype(&func_name)>(g_dllFuncPointers[func_id])(__VA_ARGS__)
 
-
 	__declspec(dllexport) __int64 __CxxFrameHandler4(__int64 a1, __int64 a2, int a3, __int64 a4)
 	{ return GET_FUNC_DEF(__CxxFrameHandler4, 0, a1, a2, a3, a4); }
 
@@ -41,54 +41,66 @@ struct ModuleData
 
 static std::vector<ModuleData> g_modulesToAttach = {};
 
-bool get_application_location(std::string& app_path)
+static void OutputDetailedErrorMsgBox(
+	const char* mainMsg,
+	const char* caption)
+{
+	std::string v_finalMsg(mainMsg);
+	v_finalMsg.append("\n\nLast Error: ");
+	v_finalMsg.append(WinError::GetLastErrorStringA());
+
+	MessageBoxA(NULL, v_finalMsg.c_str(), caption, MB_ICONERROR);
+}
+
+static bool GetApplicationLocation(std::string& outAppPath)
 {
 	namespace fs = std::filesystem;
 
-	char v_path_buffer[MAX_PATH];
-	const DWORD v_buffer_size = GetModuleFileNameA(NULL, v_path_buffer, sizeof(v_path_buffer));
-	if (v_buffer_size == 0)
+	char v_pathBuffer[MAX_PATH];
+	const DWORD v_pathBufferSz = GetModuleFileNameA(NULL, v_pathBuffer, sizeof(v_pathBuffer));
+
+	if (v_pathBufferSz == 0)
 	{
-		MessageBoxA(NULL, "Couldn't locate the application directory", "FATAL ERROR", MB_ICONERROR);
+		OutputDetailedErrorMsgBox("Couldn't locate the application directory", "FATAL ERROR");
 		return false;
 	}
 
-	fs::path v_path = std::string(v_path_buffer, static_cast<std::size_t>(v_buffer_size));
+	fs::path v_path = std::string(v_pathBuffer, static_cast<std::size_t>(v_pathBufferSz));
 	if (!v_path.has_parent_path())
 	{
 		MessageBoxA(NULL, "Couldn't locate the parent path!", "NO PARENT PATH", MB_ICONERROR);
 		return false;
 	}
 
-	app_path = v_path.parent_path().string();
+	outAppPath = v_path.parent_path().string();
 	return true;
 }
 
-bool find_modules_in_directory()
+static bool FindModuleInDirectory()
 {
 	namespace fs = std::filesystem;
 
-	std::string v_app_directory;
-	if (!get_application_location(v_app_directory))
+	std::string v_appDirectory;
+	if (!GetApplicationLocation(v_appDirectory))
 		return false;
 
-	const std::string v_module_directory = v_app_directory + "/DLLModules";
+	const std::string v_moduleDirectory = v_appDirectory + "/DLLModules";
 
 	std::error_code v_ec;
-	fs::directory_iterator v_dir_iter(v_module_directory, fs::directory_options::skip_permission_denied, v_ec);
+	fs::directory_iterator v_dirIter(v_moduleDirectory, fs::directory_options::skip_permission_denied, v_ec);
 
 	if (!v_ec)
 	{
-		for (const auto& v_cur_dir : v_dir_iter)
+		for (const auto& v_curDir : v_dirIter)
 		{
-			if (v_ec || !v_cur_dir.is_regular_file() || !v_cur_dir.path().has_extension())
+			if (v_ec || !v_curDir.is_regular_file() || !v_curDir.path().has_extension())
 				continue;
 
-			if (v_cur_dir.path().extension() != ".dll")
+			if (v_curDir.path().extension() != ".dll")
 				continue;
 
 			g_modulesToAttach.push_back(ModuleData{
-				.path = v_cur_dir.path().string(),
+				.path = v_curDir.path().string(),
 				.ptr = NULL
 			});
 		}
@@ -101,42 +113,63 @@ bool find_modules_in_directory()
 	return true;
 }
 
-bool is_correct_process()
+static bool IsInjectorDisabled()
 {
-	const HANDLE v_cur_proc = GetCurrentProcess();
-	if (!v_cur_proc) return false;
-
-	HMODULE v_proc_module;
-	DWORD v_proc_needed;
-
-	if (!EnumProcessModules(v_cur_proc, &v_proc_module, sizeof(v_proc_module), &v_proc_needed))
-		return false;
-
-	char v_module_name[MAX_PATH] = "<UNKNOWN>";
-
-	DWORD v_buffer_size = GetModuleBaseNameA(v_cur_proc, v_proc_module, v_module_name, sizeof(v_module_name));
-	if (v_buffer_size == 0)
-		return false;
-
-	const std::string v_process_name_str(v_module_name, v_buffer_size);
-	if (v_process_name_str != "ScrapMechanic.exe")
-		return false;
-
-	return true;
+	return std::string_view(GetCommandLineA()).find("-noinject") != std::string::npos;
 }
 
-void attach_process()
+static bool IsCorrectProcess()
+{
+	const HANDLE v_hCurProc = GetCurrentProcess();
+	if (!v_hCurProc) return false;
+
+	HMODULE v_procModule;
+	DWORD v_procNeeded;
+
+	if (!EnumProcessModules(v_hCurProc, &v_procModule, sizeof(v_procModule), &v_procNeeded))
+		return false;
+
+	char v_moduleName[MAX_PATH] = "<UNKNOWN>";
+	const DWORD v_moduleNameSz = GetModuleBaseNameA(v_hCurProc, v_procModule, v_moduleName, sizeof(v_moduleName));
+
+	if (v_moduleNameSz == 0)
+		return false;
+
+	return std::string_view(v_moduleName, v_moduleNameSz) == "ScrapMechanic.exe";
+}
+
+static void AttachProcess()
 {
 	g_dllModule = LoadLibraryA("vcruntime140_1_.dll");
 	if (!g_dllModule)
 	{
-		MessageBoxA(NULL, "vcruntime140_1_.dll is missing!", "MISSING DLL", MB_ICONERROR);
+		OutputDetailedErrorMsgBox("vcruntime140_1_.dll is missing!", "MISSING DLL");
 		return;
 	}
 
-	if (is_correct_process())
+	// Loading the dll procs is a number one priority
+	constexpr std::size_t v_functionCount = sizeof(g_dllFuncNames) / sizeof(const char*);
+	for (std::size_t a = 0; a < v_functionCount; a++)
 	{
-		if (!find_modules_in_directory())
+		FARPROC v_pProc = GetProcAddress(g_dllModule, g_dllFuncNames[a]);
+		if (!v_pProc)
+		{
+			OutputDetailedErrorMsgBox(g_dllFuncNames[a], "PROC NOT FOUND");
+			return;
+		}
+
+		g_dllFuncPointers[a] = v_pProc;
+	}
+
+	if (IsCorrectProcess())
+	{
+		if (IsInjectorDisabled())
+		{
+			MessageBoxA(NULL, "DLL INJECTOR IS DISABLED", "HELLYEAH", MB_OK);
+			return;
+		}
+
+		if (!FindModuleInDirectory())
 			return;
 
 		for (auto& v_module : g_modulesToAttach)
@@ -144,27 +177,14 @@ void attach_process()
 			v_module.ptr = LoadLibraryA(v_module.path.c_str());
 			if (!v_module.ptr)
 			{
-				MessageBoxA(NULL, v_module.path.c_str(), "MODULE ERROR", MB_ICONERROR);
+				OutputDetailedErrorMsgBox(v_module.path.c_str(), "MODULE ERROR");
 				return;
 			}
 		}
 	}
-
-	constexpr std::size_t v_function_count = sizeof(g_dllFuncNames) / sizeof(const char*);
-	for (std::size_t a = 0; a < v_function_count; a++)
-	{
-		FARPROC v_func_ptr = GetProcAddress(g_dllModule, g_dllFuncNames[a]);
-		if (!v_func_ptr)
-		{
-			MessageBoxA(NULL, g_dllFuncNames[a], "PROC NOT FOUND", MB_ICONERROR);
-			return;
-		}
-
-		g_dllFuncPointers[a] = v_func_ptr;
-	}
 }
 
-void detach_process()
+static void DetachProcess()
 {
 	for (auto& v_module : g_modulesToAttach)
 		if (v_module.ptr) FreeLibrary(v_module.ptr);
@@ -175,15 +195,15 @@ void detach_process()
 
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
-	switch (ul_reason_for_call) {
+	switch (ul_reason_for_call)
+	{
 	case DLL_PROCESS_ATTACH:
-		attach_process();
+		AttachProcess();
 		break;
 	case DLL_PROCESS_DETACH:
-		detach_process();
+		DetachProcess();
 		break;
-	case DLL_THREAD_ATTACH:
-	case DLL_THREAD_DETACH:
+	default:
 		break;
 	}
 

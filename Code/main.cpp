@@ -84,7 +84,8 @@ static bool FindModuleInDirectory()
 	if (!GetApplicationLocation(v_appDirectory))
 		return false;
 
-	const std::string v_moduleDirectory = v_appDirectory + "/DLLModules";
+	const fs::path v_moduleDirectory = v_appDirectory + "/DLLModules";
+	AddDllDirectory(v_moduleDirectory.wstring().c_str());
 
 	std::error_code v_ec;
 	fs::directory_iterator v_dirIter(v_moduleDirectory, fs::directory_options::skip_permission_denied, v_ec);
@@ -171,7 +172,7 @@ static void AttachProcess()
 
 		for (auto& v_module : g_modulesToAttach)
 		{
-			v_module.ptr = LoadLibraryA(v_module.path.c_str());
+			v_module.ptr = LoadLibraryExA(v_module.path.c_str(), NULL, LOAD_LIBRARY_SEARCH_USER_DIRS);
 			if (!v_module.ptr)
 			{
 				OutputDetailedErrorMsgBox(v_module.path.c_str(), "MODULE ERROR");
